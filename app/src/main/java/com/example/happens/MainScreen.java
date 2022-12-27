@@ -1,5 +1,6 @@
 package com.example.happens;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -8,13 +9,23 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +50,7 @@ public class MainScreen extends AppCompatActivity {
 
         ImageButton addEvnt = findViewById(R.id.addEvent);
         ImageButton refresh = findViewById(R.id.refresh);
-        ListView listView = findViewById(R.id.eventList);
+        ListView listViewEvents = findViewById(R.id.eventList);
 
         addEvnt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,9 +87,9 @@ public class MainScreen extends AppCompatActivity {
         }
         ArrayAdapter<String> adapter =  new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cleanList);
 
-        listView.setAdapter(adapter);
+        listViewEvents.setAdapter(adapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listViewEvents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 System.out.println(listEvents.get(listEvents.size() - i - 1).split("::::")[3]);
@@ -96,18 +107,30 @@ public class MainScreen extends AppCompatActivity {
     @SuppressLint("Range")
     public void getEvents(){
         listEvents.clear();
-        Cursor information = DB.getEvents();
-        information.moveToFirst();
-        for(int i = 0; i < information.getCount(); i++){
-            System.out.println(DatabaseUtils.dumpCurrentRowToString(information));
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-            if(information.getInt(information.getColumnIndex("isActive")) != 3) {
-                String newListItem = information.getString(information.getColumnIndex("name")) + "::::" + information.getString(information.getColumnIndex("info")) + "::::" + information.getInt(information.getColumnIndex("isActive")) + "::::" + information.getInt(information.getColumnIndex("idEnvt"));
-                System.out.println(newListItem);
-                listEvents.add(newListItem);
+        firestore.collection("Events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            /*
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                List<Event> lEventsList = new ArrayList<>();
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot document : task.getResult()) {
+                        Event event = document.toObject(Event.class);
+                        lEventsList.add(event);
+                    }
+                    ListView EventsListView = (ListView) findViewById(R.id.eventList);
+                    //Falta fazer o adapter calss
+                    Adapter eventsAdapter = new Adapter(this,lEventsList ) {
+                    };
+                    EventsListView.setAdapter(lEventsList);
+                    listEvents.add(newListItem);
+                } else {
+                    Log.d("MissionActivity", "Error getting documents: ", task.getException());
+                }
             }
+            */
+        });
 
-            information.moveToNext();
-        }
     }
 }

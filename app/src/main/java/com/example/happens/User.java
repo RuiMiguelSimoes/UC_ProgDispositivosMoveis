@@ -34,7 +34,6 @@ public class User{
 
         User newUser = new User(this.username, this.email,this.password);
         CollectionReference usersCollection = firestore.collection("Users");
-
         usersCollection.document(this.email).set(newUser);
     }
 

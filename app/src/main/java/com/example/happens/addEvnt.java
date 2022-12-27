@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class addEvnt extends AppCompatActivity {
-    DBCon objectDatabaseCon;
 
     private ImageView img;
     private static final int PICK_IMAGE_REQUEST = 100;
@@ -79,7 +78,6 @@ public class addEvnt extends AppCompatActivity {
 
         setContentView(R.layout.activity_add_evnt);
 
-        objectDatabaseCon = new DBCon(this);
         img = findViewById(R.id.eventImage);
         invtName = findViewById(R.id.invtName);
         info = findViewById(R.id.info);
@@ -192,10 +190,12 @@ public class addEvnt extends AppCompatActivity {
     public void createEvent(View view){
         try {
             if(!invtName.getText().toString().isEmpty() && !info.getText().toString().isEmpty()){
-                int id = objectDatabaseCon.getUserId(userInf.getString("username", null));
-                String name = invtName.getText().toString();
+                //o user vai ser o email logado
+
+                String  name = invtName.getText().toString();
                 String inf = info.getText().toString();
                 String actCodeStr = String.valueOf(actCode);
+
                 int isActive = 0;
                 if(officialSwitch.isChecked())
                     isActive = 1;
@@ -204,7 +204,10 @@ public class addEvnt extends AppCompatActivity {
                     Toast.makeText(addEvnt.this, "Must add image to event", Toast.LENGTH_SHORT).show();
                 else{
                     sendMail();
-                    System.out.println(objectDatabaseCon.createEvent(id, name, inf, actCodeStr, new ModelClass(imageToStore), Location, isActive));
+
+                    Event novoEvento = new Event(name, inf );
+                    novoEvento.saveNewEvent(novoEvento.name, novoEvento.desc );
+
                     startActivity(new Intent(addEvnt.this, MainScreen.class));
                 }
             }
