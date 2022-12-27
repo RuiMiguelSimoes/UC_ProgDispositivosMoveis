@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -17,7 +19,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class mainScreen extends AppCompatActivity {
+public class MainScreen extends AppCompatActivity {
 
     List<String> listEvents = new ArrayList<String>();
     List<String> cleanList = new ArrayList<String>();
@@ -25,6 +27,10 @@ public class mainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
+        getSupportActionBar().hide(); // hide the title bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
+
         setContentView(R.layout.activity_main_screen);
 
         DB = new DBCon(this);
@@ -38,7 +44,7 @@ public class mainScreen extends AppCompatActivity {
         addEvnt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(mainScreen.this, addEvnt.class));
+                startActivity(new Intent(MainScreen.this, addEvnt.class));
             }
         });
 
@@ -46,7 +52,7 @@ public class mainScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 System.out.println("RELOADING");
-                Intent reload = new Intent(mainScreen.this, mainScreen.class);
+                Intent reload = new Intent(MainScreen.this, MainScreen.class);
                 startActivity(reload);
             }
         });
@@ -82,7 +88,7 @@ public class mainScreen extends AppCompatActivity {
                 userInfEdit.putInt("eventId", Integer.parseInt(listEvents.get(listEvents.size() - i - 1).split("::::")[3]));
                 userInfEdit.commit();
 
-                startActivity(new Intent(mainScreen.this, eventPage.class));
+                startActivity(new Intent(MainScreen.this, eventPage.class));
             }
         });
     }

@@ -1,93 +1,98 @@
 package com.example.happens;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
+        getSupportActionBar().hide(); // hide the title bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
+
         setContentView(R.layout.activity_main);
 
-        EditText username, password, passwordCheck;
-        Button reg, sign;
-        DBCon DB;
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        username = findViewById(R.id.username);
-        password = findViewById(R.id.password);
-        passwordCheck = findViewById(R.id.checkPassword);
+        Button btnLogin = findViewById(R.id.btnLogin);
+        Button btnRegister = findViewById(R.id.btnRegister);
 
-        reg = findViewById(R.id.submitRegister);
-        sign = findViewById(R.id.signButton);
+        EditText email = findViewById(R.id.email_login);
+        EditText password = findViewById(R.id.password);
 
-        SharedPreferences userInf = getSharedPreferences("userInf", MODE_PRIVATE);
-        SharedPreferences.Editor userInfEdit = userInf.edit();
-
-        DB = new DBCon(this);
-
-        reg.setOnClickListener(new View.OnClickListener() {
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String strUsername = username.getText().toString();
-                String strPassword = password.getText().toString();
-                String strPasswordCheck = passwordCheck.getText().toString();
+                DocumentReference docRef = firestore.collection("Users").document(email.getText().toString());
 
-                if(strUsername.equals("")) {
-                    username.setHintTextColor(Color.parseColor("#cc0000"));
-                    username.setHint("Must enter an Username");
-                }
-                else if(strPassword.equals("")) {
-                    password.setHintTextColor(Color.parseColor("#cc0000"));
-                    password.setHint("Must enter an Password");
-                }
-                else if(strPasswordCheck.equals("")) {
-                    passwordCheck.setHintTextColor(Color.parseColor("#cc0000"));
-                    passwordCheck.setHint("Must confirm Password");
-                }
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "DocumentSnapshot data: " + document.get("password"));
 
-                else if(!strPassword.equals("") && !strPasswordCheck.equals(strPassword))
-                    passwordCheck.setTextColor(Color.parseColor("#cc0000"));
+                                MessageDigest md = null;
+                                try {
+                                    md = MessageDigest.getInstance("SHA-512");
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
 
-                else{
-                    Boolean check4User = DB.doesUserExist(strUsername);
-                    if(!check4User) {
-                        Boolean insert = DB.insertData(strUsername, strPassword);
-                        userInfEdit.putString("username", username.getText().toString());
-                        userInfEdit.commit();
-                        Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(MainActivity.this, mainScreen.class));
+                                String passwordToHash = password.getText().toString();
+                                byte[] hashedPassword = md.digest(passwordToHash.getBytes(StandardCharsets.UTF_8));
+
+                                email.setHint(document.get("password").toString());
+                                password.setHint(hashedPassword.toString());
+
+                                if (Objects.requireNonNull(document.get("password")).toString().equals(hashedPassword.toString())){
+                                    startActivity(new Intent(MainActivity.this, MainScreen.class));
+                                }
+                            } else {
+                                Log.d(TAG, "No such document");
+                                email.setHint("e-mail não existe!");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
                     }
-                    else
-                        Toast.makeText(MainActivity.this, "Username Taken", Toast.LENGTH_SHORT).show();
-                }
+                });
             }
         });
 
-        sign.setOnClickListener(new View.OnClickListener() {
+        btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, login.class));
-            }
-        });
-
-        passwordCheck.addTextChangedListener(new TextWatcher() {
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                passwordCheck.setTextColor(Color.parseColor("#000000"));
+                startActivity(new Intent(MainActivity.this, RegisterActivity.class));
             }
         });
     }

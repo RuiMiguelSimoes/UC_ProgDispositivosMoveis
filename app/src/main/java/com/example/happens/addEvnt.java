@@ -34,6 +34,8 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -70,6 +72,11 @@ public class addEvnt extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
+        getSupportActionBar().hide(); // hide the title bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
+
         setContentView(R.layout.activity_add_evnt);
 
         objectDatabaseCon = new DBCon(this);
@@ -198,7 +205,7 @@ public class addEvnt extends AppCompatActivity {
                 else{
                     sendMail();
                     System.out.println(objectDatabaseCon.createEvent(id, name, inf, actCodeStr, new ModelClass(imageToStore), Location, isActive));
-                    startActivity(new Intent(addEvnt.this, mainScreen.class));
+                    startActivity(new Intent(addEvnt.this, MainScreen.class));
                 }
             }
         } catch (Exception e){

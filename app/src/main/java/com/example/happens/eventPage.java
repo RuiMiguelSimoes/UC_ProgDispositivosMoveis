@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,6 +36,11 @@ public class eventPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE); //will hide the title
+        getSupportActionBar().hide(); // hide the title bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); //enable full screen
+
         setContentView(R.layout.activity_event_page);
 
         DB = new DBCon(this);
@@ -45,8 +52,19 @@ public class eventPage extends AppCompatActivity {
         actCodeBox = findViewById(R.id.actCodeInput);
         button = findViewById(R.id.submitAct);
         delete = findViewById(R.id.delete);
+        Button btnVoltar = findViewById(R.id.voltar_actEventPage);
+
+        //butão para voltar a trás TIAGO seu idiota!! n havia botão! AAAAAAA a unica forma de voltar era apagar o evento xD
+        btnVoltar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(eventPage.this, MainScreen.class));
+            }
+        });
 
         getEvent();
+
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,10 +151,12 @@ public class eventPage extends AppCompatActivity {
             if(information.getInt(information.getColumnIndex("idEnvt")) == userInf.getInt("eventId", -1)){
                 DB.uptadeUptadeAct(3, userInf.getInt("eventId", -1));
 
-                startActivity(new Intent(eventPage.this, mainScreen.class));
+                startActivity(new Intent(eventPage.this, MainScreen.class));
             }
 
             information.moveToNext();
         }
     }
+
+
 }

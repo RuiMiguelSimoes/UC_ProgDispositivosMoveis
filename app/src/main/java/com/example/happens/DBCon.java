@@ -53,6 +53,7 @@ public class DBCon extends SQLiteOpenHelper{
     }
 
 
+
     public Boolean doesUserExist(String username){
         SQLiteDatabase HappeningDB = this.getWritableDatabase();
         Cursor cursor = HappeningDB.rawQuery("SELECT * FROM users WHERE username = ?", new String[]{username});
