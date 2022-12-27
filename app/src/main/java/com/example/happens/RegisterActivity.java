@@ -45,7 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
+
                 if(strUsername.equals("")) {
                     username.setHintTextColor(Color.parseColor("#cc0000"));
                     username.setHint("Must enter an Username");
@@ -67,24 +67,17 @@ public class RegisterActivity extends AppCompatActivity {
 
                 if(strPassword.equals("") && !strPasswordCheck.equals(strPassword))
                     passwordCheck.setTextColor(Color.parseColor("#cc0000"));
-                */
-                if(strPassword.equals(strPasswordCheck) && strPassword!=""){
-                    try {
 
-                        MessageDigest md = MessageDigest.getInstance("SHA-512");
-                        byte[] hashedPassword = md.digest(strPassword.getBytes(StandardCharsets.UTF_8));
+                else if(strPassword.equals(strPasswordCheck) ){
 
                         User newUser = new User();
                         newUser.email=email.getText().toString();
                         newUser.username=username.getText().toString();
-                        newUser.password=hashedPassword.toString();
+                        newUser.password=password.getText().toString();
 
                         newUser.writeNewUser(newUser.username, newUser.email, newUser.password);
 
                         startActivity(new Intent(RegisterActivity.this, MainActivity.class));
-                    } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    }
                 }
 
             }

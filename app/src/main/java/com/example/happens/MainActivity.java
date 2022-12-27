@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,33 +54,23 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 DocumentReference docRef = firestore.collection("Users").document(email.getText().toString());
 
+
+
                 docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
+
                             if (document.exists()) {
                                 Log.d(TAG, "DocumentSnapshot data: " + document.get("password"));
 
-                                MessageDigest md = null;
-                                try {
-                                    md = MessageDigest.getInstance("SHA-512");
-                                } catch (NoSuchAlgorithmException e) {
-                                    e.printStackTrace();
-                                }
-
-                                String passwordToHash = password.getText().toString();
-                                byte[] hashedPassword = md.digest(passwordToHash.getBytes(StandardCharsets.UTF_8));
-
-                                email.setHint(document.get("password").toString());
-                                password.setHint(hashedPassword.toString());
-
-                                if (Objects.requireNonNull(document.get("password")).toString().equals(hashedPassword.toString())){
-                                    startActivity(new Intent(MainActivity.this, MainScreen.class));
-                                }
+                                if (password.getText().toString().equals(document.get("password"))   ){
+                                        startActivity(new Intent(MainActivity.this, MainScreen.class));
+                                    }
                             } else {
                                 Log.d(TAG, "No such document");
-                                email.setHint("e-mail não existe!");
+                                email.setText("e-mail não existe!");
                             }
                         } else {
                             Log.d(TAG, "get failed with ", task.getException());
