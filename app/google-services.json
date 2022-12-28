@@ -1,0 +1,40 @@
+ {
+  "project_info": {
+    "project_number": "983755584301",
+    "firebase_url": "https://happeningdb-469ac-default-rtdb.firebaseio.com",
+    "project_id": "happeningdb-469ac",
+    "storage_bucket": "happeningdb-469ac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983755584301:android:a70129e25102f1c84d59a4",
+        "android_client_info": {
+          "package_name": "com.example.happens"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "983755584301-vuk497gsl5p5karudmrgh1brbo6k0cug.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtHaThl4ABoXkk-Svw7Q-eAohnJz_chAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "983755584301-vuk497gsl5p5karudmrgh1brbo6k0cug.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
